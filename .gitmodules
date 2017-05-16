@@ -1,0 +1,6 @@
+[submodule "POC/polymer_dynamic_components"]
+	path = POC/polymer_dynamic_components
+	url = https://github.com/Sehsyha/polymer_dynamic_components.git
+[submodule "POC/openface"]
+	path = POC/openface
+	url = https://github.com/cmusatyalab/openface
