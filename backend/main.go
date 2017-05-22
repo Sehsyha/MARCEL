@@ -1,14 +1,15 @@
 package main
 
 import (
-	"github.com/Zenika/MARCEL/backend/agenda"
-	"github.com/Zenika/MARCEL/backend/weather"
-	"github.com/Zenika/MARCEL/backend/twitter"
-	"github.com/gorilla/mux"
-	"github.com/rs/cors"
 	"net/http"
 	"log"
 	"os"
+	
+	"github.com/Zenika/MARCEL/backend/weather"
+	"github.com/Zenika/MARCEL/backend/agenda"
+	"github.com/Zenika/MARCEL/backend/twitter"
+	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 var logFile string = os.Getenv("MARCEL_LOG_FILE");
@@ -38,8 +39,10 @@ func main() {
 	r.HandleFunc("/api/v1/agenda/incoming/{nbEvents:[0-9]*}", agenda.GetNextEvents)
 	r.HandleFunc("/api/v1/twitter/timeline/{nbTweets:[0-9]*}", twitter.GetTimeline)
 
+	twitter.GetStream()
+
 	handler := c.Handler(r)
 
 	http.ListenAndServe(":8090", handler)
-
+	
 }
