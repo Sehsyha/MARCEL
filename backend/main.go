@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	
+	"github.com/googollee/go-socket.io"
 	"github.com/Zenika/MARCEL/backend/weather"
 	"github.com/Zenika/MARCEL/backend/agenda"
 	"github.com/Zenika/MARCEL/backend/twitter"
@@ -34,12 +35,27 @@ func main() {
 		AllowCredentials: true,
 	})
 
+	server, err := socketio.NewServer(nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	server.On("connection", func(so socketio.Socket) {
+		stream := twitter.GetStream(so)
+		so.On("disconnection", func() {
+			stream.Stop()
+		})
+	})
+
+	server.On("error", func(so socketio.Socket, err error) {
+		log.Println("error:", err)
+	})
+
 	r := mux.NewRouter()
 	r.HandleFunc("/api/v1/weather/forecast/{nbForecasts:[0-9]+}", weather.GetForecastWeatherHandler)
 	r.HandleFunc("/api/v1/agenda/incoming/{nbEvents:[0-9]*}", agenda.GetNextEvents)
 	r.HandleFunc("/api/v1/twitter/timeline/{nbTweets:[0-9]*}", twitter.GetTimeline)
-
-	twitter.GetStream()
+	r.Handle("/socket.io/", server);
 
 	handler := c.Handler(r)
 

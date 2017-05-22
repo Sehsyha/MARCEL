@@ -49,16 +49,18 @@
       }
     </style>
     <h1>Twitter</h1>
-
-    <h2>Last tweet <i class="fa fa-twitter"></i></h2>
+    <h2>Last tweets <i class="fa fa-twitter"></i></h2>
     <ul>
-      <template is="dom-repeat" items="[[tweets]]" as="tweet">
+      <template is="dom-repeat" items="{{tweets}}" as="tweet">
         <li>
-          <img src="{{tweet.user.profile_image_url}}" alt="" />
+          <template is="dom-if" if="[[tweet.user.profile_image_url]]">
+            <img src="{{tweet.user.profile_image_url}}" alt="" />
+          </template>
           <p>{{tweet.text}}</p>
         </li>
       </template>
     </ul>
+    
   </template>
 
   <script>
@@ -70,7 +72,8 @@
           return {
             api: String,
             timer: Number,
-            tweets: Array
+            tweet: Object,
+            tweets: Array,
           }
         }
 
@@ -79,9 +82,17 @@
 
           this.tweets = [];
           this.timer = 1000 * 60 * 60;
+          this.tweet = {};
 
           this._updateTimeline();
           setInterval(() => this._updateTimeline(), this.timer);
+         
+          twitter_socket.on('tweet', (tweet) => this._addTweet(tweet));
+        }
+
+        _addTweet (tweet) {
+          this.splice('tweets', 0, 1);
+          this.push('tweets', tweet);
         }
 
         _updateTimeline () {

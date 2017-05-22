@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 	"log"
-	"fmt"
 
+	"github.com/googollee/go-socket.io"
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/Zenika/MARCEL/backend/auth"
 	"github.com/gorilla/mux"
@@ -30,7 +30,7 @@ func GetTimeline(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetStream() {
+func GetStream(so socketio.Socket) *twitter.Stream {
 	client := auth.RequireTwitterClient();
 	demux := twitter.NewSwitchDemux()
 
@@ -43,9 +43,8 @@ func GetStream() {
 		log.Fatal(err)
 	}
 	demux.Tweet = func(tweet *twitter.Tweet) {
-		fmt.Println(tweet.Text)
+		so.Emit("tweet", tweet)
 	}
-	for message := range stream.Messages {
-		demux.Handle(message);
-	}
+	demux.HandleChan(stream.Messages)
+	return stream;
 }
