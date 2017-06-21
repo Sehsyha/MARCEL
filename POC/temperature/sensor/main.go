@@ -35,22 +35,7 @@ func main() {
 		panic(err)
 	}
 
-	subscribeFuture, err := c.Subscribe("test", 0)
-	if err != nil {
-		panic(err)
-	}
-
-	err = subscribeFuture.Wait(10 * time.Second)
-	if err != nil {
-		panic(err)
-	}
-
-	publishFuture, err := c.Publish("test", []byte("test"), 0, false)
-	if err != nil {
-		panic(err)
-	}
-
-	err = publishFuture.Wait(10 * time.Second)
+	_, err = c.Publish("temperature", []byte("{name: 'Salle 1', value: '32'}"), 0, false)
 	if err != nil {
 		panic(err)
 	}
